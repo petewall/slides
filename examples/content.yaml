@@ -1,0 +1,41 @@
+meta:
+  title: Marseille Demo
+  subtitle: A presentation server
+  date: "April 9th, 2026"
+  logo: ""
+
+slides:
+  - title: ""
+    subtitle: ""
+    content:
+      - text: Marseille
+        size: larger
+      - text: A node-based presentation server
+
+  - content:
+      - text: "Agenda:"
+      - text: "1. What is Marseille?"
+      - text: "2. Content types"
+      - text: "3. Customization"
+
+  - title: "Content Types"
+    content:
+      - text: "Marseille supports several content types"
+      - columns:
+          - text: "Text blocks"
+          - text: "Images"
+          - text: "Iframes"
+
+  - title: "Raw HTML"
+    content:
+      - html: |
+          <div style="text-align: center; padding: 2rem;">
+            <h2 style="color: #e94560;">Custom HTML</h2>
+            <p>You can embed any HTML you need.</p>
+          </div>
+
+  - title: "Thank You"
+    subtitle: ""
+    content:
+      - text: Questions?
+        size: larger

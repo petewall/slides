@@ -1,0 +1,10 @@
+node_modules
+.context
+.git
+.github
+test
+vitest.config.js
+eslint.config.js
+content.yaml
+PLAN.md
+LICENSE
