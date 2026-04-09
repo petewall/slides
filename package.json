@@ -1,0 +1,32 @@
+{
+  "name": "marseille",
+  "version": "1.0.0",
+  "description": "A node-based presentation server",
+  "main": "src/index.js",
+  "bin": {
+    "presenter": "./bin/presenter.js"
+  },
+  "scripts": {
+    "start": "node bin/presenter.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "lint:fix": "eslint --fix src/ test/"
+  },
+  "keywords": [],
+  "author": "Pete Wall",
+  "license": "Apache-2.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@fastify/static": "^9.1.0",
+    "commander": "^14.0.3",
+    "fastify": "^5.8.4",
+    "js-yaml": "^4.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.4"
+  }
+}

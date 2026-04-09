@@ -1,0 +1,195 @@
+/* Marseille Presenter — Default Dark Theme */
+
+:root {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --bg-surface: #1a1d28;
+  --text-primary: #f5f7ff;
+  --text-secondary: #9aa2c1;
+  --accent: #36d7b7;
+  --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-base: 1.5rem;
+  --font-size-smaller: 1.2rem;
+  --font-size-larger: 2.2rem;
+  --font-size-title: 1.1rem;
+  --font-size-subtitle: 0.9rem;
+  --frame-height: 3rem;
+  --progress-height: 4px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+/* Slide container — full viewport */
+.slide {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Frame — top bar with title/subtitle/logo/date */
+.slide-frame {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1.5rem;
+  height: var(--frame-height);
+  min-height: var(--frame-height);
+  background: var(--bg-surface);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--font-size-title);
+}
+
+.slide-frame:empty {
+  display: none;
+}
+
+.slide-logo {
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.slide-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.slide-subtitle {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.slide-date {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: var(--font-size-subtitle);
+}
+
+/* Content area — fills remaining space, rows distributed evenly */
+.slide-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 4rem;
+  gap: 1.5rem;
+}
+
+.slide-content > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Text content */
+.content-text {
+  text-align: center;
+  line-height: 1.4;
+}
+
+.content-text[data-size="smaller"] {
+  font-size: var(--font-size-smaller);
+}
+
+.content-text[data-size="larger"] {
+  font-size: var(--font-size-larger);
+}
+
+/* Image content */
+.content-image {
+  justify-content: center;
+}
+
+.content-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Iframe content */
+.content-iframe {
+  width: 100%;
+  position: relative;
+}
+
+.content-iframe iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 4px;
+}
+
+.content-iframe.loading iframe {
+  opacity: 0;
+}
+
+.iframe-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: -1.25rem 0 0 -1.25rem;
+  border: 3px solid var(--text-secondary);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.content-iframe:not(.loading) .iframe-spinner {
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* HTML content */
+.content-html {
+  width: 100%;
+}
+
+/* Columns layout */
+.content-columns {
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.content-column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Progress bar */
+#progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: var(--progress-height);
+  background: var(--accent);
+  transition: width 0.3s ease;
+  z-index: 100;
+}
