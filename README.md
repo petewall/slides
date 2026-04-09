@@ -1,4 +1,4 @@
-# Marseille
+# Slides
 
 A node-based presentation server. Write your slides in YAML, serve them as a full-screen web presentation, and customize the look with CSS.
 
@@ -147,7 +147,7 @@ Raw HTML for anything the other types don't cover.
 
 ```yaml
 meta:
-  title: Marseille Demo
+  title: Slides Demo
   subtitle: A presentation server
   date: "April 9th, 2026"
 
@@ -155,19 +155,19 @@ slides:
   - title: ""
     subtitle: ""
     content:
-      - text: Marseille
+      - text: Slides
         size: larger
       - text: A node-based presentation server
 
   - content:
       - text: "Agenda:"
-      - text: "1. What is Marseille?"
+      - text: "1. What is Slides?"
       - text: "2. Content types"
       - text: "3. Customization"
 
   - title: Content Types
     content:
-      - text: Marseille supports several content types
+      - text: Slides supports several content types
       - columns:
           - text: Text blocks
           - text: Images
