@@ -69,6 +69,14 @@ html, body {
   left: 0;
 }
 
+/* Right pane — slide + editor panel stacked vertically */
+#right-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* Main view — selected slide */
 #main-view {
   flex: 1;
@@ -77,6 +85,7 @@ html, body {
   justify-content: center;
   padding: 2rem;
   overflow: hidden;
+  min-height: 0;
 }
 
 #slide-container {
@@ -111,4 +120,63 @@ html, body {
 #slide-container .slide-frame .slide-title:hover,
 #slide-container .slide-frame .slide-subtitle:hover {
   outline-color: var(--accent);
+}
+
+#slide-container .slide-content > *.selected,
+#slide-container .slide-frame .slide-title.selected,
+#slide-container .slide-frame .slide-subtitle.selected {
+  outline-color: var(--accent);
+}
+
+/* Editor panel */
+#editor-panel {
+  height: 200px;
+  min-height: 200px;
+  background: var(--bg-surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+#panel-placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+#panel-content.hidden {
+  display: none;
+}
+
+#panel-content .panel-type {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#panel-content .panel-value {
+  color: var(--text-primary);
+  background: var(--bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+#panel-content .panel-overrides {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+#panel-content .panel-overrides .override-label {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#panel-content .panel-overrides .override-value {
+  color: var(--text-primary);
 }

@@ -3,6 +3,7 @@
 
   let slideData = null;
   let selectedSlide = 0;
+  let selectedElement = null;
 
   async function init() {
     const [slidesRes, stylesRes] = await Promise.all([
@@ -94,8 +95,146 @@
   function renderMainSlide() {
     const container = document.getElementById("slide-container");
     container.innerHTML = "";
+    selectedElement = null;
+    clearPanel();
+
     const slide = slideData.slides[selectedSlide];
     container.appendChild(renderSlide(slide, selectedSlide));
+    attachClickHandlers(container, slide);
+  }
+
+  function attachClickHandlers(container, slide) {
+    // Content blocks
+    const contentItems = container.querySelectorAll(".slide-content > *");
+    contentItems.forEach((el, i) => {
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectContentBlock(el, slide.content[i]);
+      });
+    });
+
+    // Frame title
+    const titleEl = container.querySelector(".slide-title");
+    if (titleEl) {
+      titleEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectFrameField(titleEl, "title", slide);
+      });
+    }
+
+    // Frame subtitle
+    const subtitleEl = container.querySelector(".slide-subtitle");
+    if (subtitleEl) {
+      subtitleEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectFrameField(subtitleEl, "subtitle", slide);
+      });
+    }
+  }
+
+  function selectContentBlock(el, item) {
+    clearSelection();
+    selectedElement = el;
+    el.classList.add("selected");
+    showContentPanel(item);
+  }
+
+  function selectFrameField(el, field, slide) {
+    clearSelection();
+    selectedElement = el;
+    el.classList.add("selected");
+    showFramePanel(field, slide);
+  }
+
+  function clearSelection() {
+    if (selectedElement) {
+      selectedElement.classList.remove("selected");
+      selectedElement = null;
+    }
+  }
+
+  // --- Editor panel ---
+
+  function clearPanel() {
+    const placeholder = document.getElementById("panel-placeholder");
+    const content = document.getElementById("panel-content");
+    placeholder.style.display = "";
+    content.classList.add("hidden");
+    content.innerHTML = "";
+  }
+
+  function showPanel(html) {
+    const placeholder = document.getElementById("panel-placeholder");
+    const content = document.getElementById("panel-content");
+    placeholder.style.display = "none";
+    content.classList.remove("hidden");
+    content.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function showContentPanel(item) {
+    let typeLabel;
+    let value;
+
+    switch (item.type) {
+      case "text":
+        typeLabel = "Text";
+        value = item.value;
+        break;
+      case "image":
+        typeLabel = "Image";
+        value = item.url;
+        break;
+      case "iframe":
+        typeLabel = "Iframe";
+        value = item.url;
+        break;
+      case "html":
+        typeLabel = "HTML";
+        value = item.value;
+        break;
+      case "columns":
+        typeLabel = "Columns";
+        value = item.items.length + " columns";
+        break;
+      default:
+        typeLabel = item.type;
+        value = JSON.stringify(item);
+    }
+
+    showPanel(
+      `<div class="panel-type">${escapeHtml(typeLabel)}</div>` +
+      `<div class="panel-value">${escapeHtml(value)}</div>`
+    );
+  }
+
+  function showFramePanel(field, slide) {
+    const meta = slideData.meta;
+    const frame = slide.frame;
+    const metaValue = meta[field] || "";
+    const hasOverride = Object.prototype.hasOwnProperty.call(frame, field) && frame[field] !== metaValue;
+
+    let html = `<div class="panel-type">Frame: ${escapeHtml(field)}</div>`;
+    html += `<div class="panel-value">${escapeHtml(frame[field] || "")}</div>`;
+
+    if (hasOverride) {
+      html += `<div class="panel-overrides">` +
+        `<span class="override-label">Override: </span>` +
+        `<span class="override-value">This slide overrides the meta ${escapeHtml(field)} ` +
+        `(meta value: "${escapeHtml(metaValue)}")</span>` +
+        `</div>`;
+    } else {
+      html += `<div class="panel-overrides">` +
+        `<span class="override-value">Inherited from meta</span>` +
+        `</div>`;
+    }
+
+    showPanel(html);
   }
 
   // --- Shared slide rendering ---
