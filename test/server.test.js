@@ -134,4 +134,24 @@ slides:
       expect(res.headers["content-type"]).toMatch(/text\/html/);
     });
   });
+
+  describe("GET /editor.html", () => {
+    it("serves the editor page", async () => {
+      const contentPath = writeContent(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hi
+`
+      );
+
+      app = buildApp({ content: contentPath, style: [] });
+      const res = await app.inject({ method: "GET", url: "/editor.html" });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/text\/html/);
+      expect(res.payload).toContain("Editor");
+    });
+  });
 });
