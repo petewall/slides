@@ -95,3 +95,20 @@ html, body {
   width: 100%;
   height: 100%;
 }
+
+/* Hover highlights on content blocks in main view */
+#slide-container .slide-content > *,
+#slide-container .slide-frame .slide-title,
+#slide-container .slide-frame .slide-subtitle {
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: outline-color 0.15s ease;
+}
+
+#slide-container .slide-content > *:hover,
+#slide-container .slide-frame .slide-title:hover,
+#slide-container .slide-frame .slide-subtitle:hover {
+  outline-color: var(--accent);
+}
