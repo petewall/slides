@@ -59,6 +59,53 @@ html, body {
   z-index: 1;
 }
 
+.thumbnail-delete {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: none;
+  border-radius: 2px;
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.thumbnail:hover .thumbnail-delete {
+  display: flex;
+}
+
+.thumbnail-delete:hover {
+  background: rgba(231, 76, 60, 1);
+}
+
+/* Add slide button */
+.sidebar-add-btn {
+  flex-shrink: 0;
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-add-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .thumbnail-viewport {
   width: 1024px;
   height: 768px;
@@ -107,6 +154,7 @@ html, body {
 
 /* Hover highlights on content blocks in main view */
 #slide-container .slide-content > *,
+#slide-container .content-column > *,
 #slide-container .slide-frame .slide-title,
 #slide-container .slide-frame .slide-subtitle {
   outline: 2px solid transparent;
@@ -117,12 +165,19 @@ html, body {
 }
 
 #slide-container .slide-content > *:hover,
+#slide-container .content-column > *:hover,
 #slide-container .slide-frame .slide-title:hover,
 #slide-container .slide-frame .slide-subtitle:hover {
   outline-color: var(--accent);
 }
 
+/* Don't highlight the columns container when hovering a child */
+#slide-container .slide-content > .content-columns:has(:hover) {
+  outline-color: transparent;
+}
+
 #slide-container .slide-content > *.selected,
+#slide-container .content-column > *.selected,
 #slide-container .slide-frame .slide-title.selected,
 #slide-container .slide-frame .slide-subtitle.selected {
   outline-color: var(--accent);
@@ -179,4 +234,71 @@ html, body {
 
 #panel-content .panel-overrides .override-value {
   color: var(--text-primary);
+}
+
+/* Editable inputs */
+#panel-content .panel-input {
+  display: block;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+#panel-content .panel-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Save / Cancel buttons */
+.panel-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.panel-btn {
+  padding: 0.35rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.panel-btn:hover {
+  opacity: 0.85;
+}
+
+.panel-btn-save {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.panel-btn-cancel {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Status indicator */
+.panel-status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  border-radius: 4px;
+}
+
+.panel-status.error {
+  color: #e74c3c;
 }

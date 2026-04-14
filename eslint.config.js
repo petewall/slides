@@ -39,6 +39,7 @@ module.exports = [
         window: "readonly",
         fetch: "readonly",
         HTMLElement: "readonly",
+        URLSearchParams: "readonly",
       },
     },
   },

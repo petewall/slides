@@ -15,9 +15,9 @@ _No planned features at this time._
     - HTML: show "HTML: \<raw html\>"
     - Columns: show "Columns: \<number of columns\>"
   - [x] Click frame title/subtitle to show slide-level overrides for those fields
-  - [ ] Edit content values in the details panel
+  - [x] Edit content values in the details panel
   - [ ] Edit per-block styles in the details panel
 - [ ] Set styles
-- [ ] Add and delete slides
+- [x] Add and delete slides
 - [ ] Update content grid
 - [ ] Update speaker notes

@@ -9,7 +9,7 @@ npm install
 node bin/presenter.js --content examples/content.yaml
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. Use **arrow keys** or **spacebar** to navigate.
+Open [http://localhost:4000](http://localhost:4000) in your browser. Use **arrow keys** or **spacebar** to navigate.
 
 ### CLI options
 
@@ -17,7 +17,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. Use **arrow
 |------|-------------|---------|
 | `--content <file>` | Path to content file (YAML or JSON) | `content.yaml` |
 | `--style <file>` | Path to custom CSS file (repeatable) | none |
-| `--port <port>` | Port to listen on | `3000` |
+| `--port <port>` | Port to listen on | `4000` |
 
 You can pass multiple `--style` flags to layer stylesheets:
 
@@ -30,7 +30,7 @@ node bin/presenter.js --content examples/content.yaml --style theme.css --style 
 The container image is published to `ghcr.io/petewall/slides`. Mount your content (and optional stylesheets) into the container:
 
 ```bash
-docker run -p 3000:3000 \
+docker run -p 4000:4000 \
   -v ./content.yaml:/content/content.yaml \
   -v ./style.css:/content/style.css \
   ghcr.io/petewall/slides \
@@ -44,7 +44,7 @@ services:
   slides:
     image: ghcr.io/petewall/slides:latest
     ports:
-      - "3000:3000"
+      - "4000:4000"
     volumes:
       - ./content.yaml:/content/content.yaml
       - ./style.css:/content/style.css

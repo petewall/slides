@@ -6,7 +6,7 @@ function parseArgs(argv) {
   program
     .option("--content <file>", "Path to content file (YAML or JSON)", "content.yaml")
     .option("--style <file>", "Path to custom CSS file (can be specified multiple times)", collect, [])
-    .option("--port <port>", "Port to listen on", "3000");
+    .option("--port <port>", "Port to listen on", "4000");
 
   program.parse(argv, { from: "user" });
 

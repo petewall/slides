@@ -12,6 +12,6 @@ COPY src/ ./src/
 COPY public/ ./public/
 
 LABEL org.opencontainers.image.source = "https://github.com/petewall/slides"
-EXPOSE 3000
+EXPOSE 4000
 ENTRYPOINT ["node", "bin/presenter.js"]
 CMD ["--content", "/content/content.yaml"]

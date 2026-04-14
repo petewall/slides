@@ -22,9 +22,20 @@
       document.head.appendChild(style);
     });
 
+    const params = new URLSearchParams(window.location.search);
+    const slideParam = parseInt(params.get("slide"), 10);
+    if (!isNaN(slideParam) && slideParam >= 0 && slideParam < slideData.slides.length) {
+      selectedSlide = slideParam;
+    }
+
     document.addEventListener("keydown", handleKeydown);
     renderSidebar();
     renderMainSlide();
+
+    const activeThumb = document.querySelector(".thumbnail.active");
+    if (activeThumb) {
+      activeThumb.scrollIntoView({ block: "nearest" });
+    }
   }
 
   function handleKeydown(e) {
@@ -42,8 +53,36 @@
       return;
     }
     selectedSlide = index;
+    const url = new URL(window.location);
+    url.searchParams.set("slide", index);
+    window.history.replaceState(null, "", url);
     updateSidebarSelection();
     renderMainSlide();
+  }
+
+  // --- Add / Delete slides ---
+
+  async function addSlide() {
+    const newSlide = {
+      frame: { ...slideData.meta },
+      content: [{ type: "text", value: "New slide" }],
+    };
+    slideData.slides.splice(selectedSlide + 1, 0, newSlide);
+    selectedSlide = selectedSlide + 1;
+    await saveSlideData();
+  }
+
+  async function deleteSlide(index) {
+    if (slideData.slides.length <= 1) {
+      return;
+    }
+    slideData.slides.splice(index, 1);
+    if (selectedSlide >= slideData.slides.length) {
+      selectedSlide = slideData.slides.length - 1;
+    } else if (selectedSlide > index) {
+      selectedSlide--;
+    }
+    await saveSlideData();
   }
 
   // --- Sidebar ---
@@ -63,6 +102,18 @@
       label.textContent = i + 1;
       thumb.appendChild(label);
 
+      if (slideData.slides.length > 1) {
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "thumbnail-delete";
+        deleteBtn.textContent = "\u00d7";
+        deleteBtn.title = "Delete slide";
+        deleteBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deleteSlide(i);
+        });
+        thumb.appendChild(deleteBtn);
+      }
+
       const viewport = document.createElement("div");
       viewport.className = "thumbnail-viewport";
       viewport.appendChild(renderSlide(slide, i));
@@ -74,6 +125,12 @@
       const scale = thumb.clientWidth / 1024;
       viewport.style.transform = `scale(${scale})`;
     });
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "sidebar-add-btn";
+    addBtn.textContent = "+ Add slide";
+    addBtn.addEventListener("click", () => addSlide());
+    sidebar.appendChild(addBtn);
   }
 
   function updateSidebarSelection() {
@@ -103,15 +160,40 @@
     attachClickHandlers(container, slide);
   }
 
+  function attachContentClickHandlers(parentEl, items) {
+    const children = parentEl.children;
+    items.forEach((item, i) => {
+      const el = children[i];
+      if (item.type === "columns") {
+        // Columns container itself is clickable
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectContentBlock(el, item);
+        });
+        // Column children are also clickable (stopPropagation prevents bubbling to container)
+        item.items.forEach((child, j) => {
+          const colEl = el.children[j];
+          const childEl = colEl.firstChild;
+          if (childEl) {
+            childEl.addEventListener("click", (e) => {
+              e.stopPropagation();
+              selectContentBlock(childEl, child);
+            });
+          }
+        });
+      } else {
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectContentBlock(el, item);
+        });
+      }
+    });
+  }
+
   function attachClickHandlers(container, slide) {
     // Content blocks
-    const contentItems = container.querySelectorAll(".slide-content > *");
-    contentItems.forEach((el, i) => {
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectContentBlock(el, slide.content[i]);
-      });
-    });
+    const contentEl = container.querySelector(".slide-content");
+    attachContentClickHandlers(contentEl, slide.content);
 
     // Frame title
     const titleEl = container.querySelector(".slide-title");
@@ -163,78 +245,165 @@
     content.innerHTML = "";
   }
 
-  function showPanel(html) {
+  function showPanel(panelEl) {
     const placeholder = document.getElementById("panel-placeholder");
     const content = document.getElementById("panel-content");
     placeholder.style.display = "none";
     content.classList.remove("hidden");
-    content.innerHTML = html;
+    content.innerHTML = "";
+    content.appendChild(panelEl);
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
+  function createButtons(onSave, onCancel) {
+    const bar = document.createElement("div");
+    bar.className = "panel-buttons";
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "panel-btn panel-btn-save";
+    saveBtn.textContent = "Save";
+    saveBtn.addEventListener("click", onSave);
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "panel-btn panel-btn-cancel";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("click", onCancel);
+
+    bar.appendChild(saveBtn);
+    bar.appendChild(cancelBtn);
+    return bar;
+  }
+
+  async function saveSlideData() {
+    const res = await fetch("/api/slides", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(slideData),
+    });
+    if (!res.ok) {
+      showStatus("Save failed: " + res.status, true);
+      return;
+    }
+    showStatus("Saved");
+    renderSidebar();
+    renderMainSlide();
+  }
+
+  function showStatus(message, isError) {
+    let status = document.getElementById("panel-status");
+    if (!status) {
+      status = document.createElement("div");
+      status.id = "panel-status";
+      document.getElementById("editor-panel").appendChild(status);
+    }
+    status.textContent = message;
+    status.className = isError ? "panel-status error" : "panel-status";
+    clearTimeout(status._timer);
+    status._timer = setTimeout(() => {
+      status.remove();
+    }, 2000);
+  }
+
+  function getContentValueAndKey(item) {
+    switch (item.type) {
+      case "text":
+        return { label: "Text", key: "value", value: item.value };
+      case "image":
+        return { label: "Image", key: "url", value: item.url };
+      case "iframe":
+        return { label: "Iframe", key: "url", value: item.url };
+      case "html":
+        return { label: "HTML", key: "value", value: item.value };
+      case "columns":
+        return { label: "Columns", key: null, value: item.items.length + " columns" };
+      default:
+        return { label: item.type, key: null, value: JSON.stringify(item) };
+    }
   }
 
   function showContentPanel(item) {
-    let typeLabel;
-    let value;
+    const { label, key, value } = getContentValueAndKey(item);
+    const panel = document.createElement("div");
 
-    switch (item.type) {
-      case "text":
-        typeLabel = "Text";
-        value = item.value;
-        break;
-      case "image":
-        typeLabel = "Image";
-        value = item.url;
-        break;
-      case "iframe":
-        typeLabel = "Iframe";
-        value = item.url;
-        break;
-      case "html":
-        typeLabel = "HTML";
-        value = item.value;
-        break;
-      case "columns":
-        typeLabel = "Columns";
-        value = item.items.length + " columns";
-        break;
-      default:
-        typeLabel = item.type;
-        value = JSON.stringify(item);
+    const typeEl = document.createElement("div");
+    typeEl.className = "panel-type";
+    typeEl.textContent = label;
+    panel.appendChild(typeEl);
+
+    if (key) {
+      const useTextarea = item.type === "html";
+      const input = document.createElement(useTextarea ? "textarea" : "input");
+      input.className = "panel-input";
+      if (useTextarea) {
+        input.rows = 4;
+      } else {
+        input.type = "text";
+      }
+      input.value = value;
+      panel.appendChild(input);
+
+      const originalValue = value;
+      panel.appendChild(createButtons(
+        async () => {
+          item[key] = input.value;
+          await saveSlideData();
+        },
+        () => {
+          input.value = originalValue;
+        }
+      ));
+    } else {
+      const valueEl = document.createElement("div");
+      valueEl.className = "panel-value";
+      valueEl.textContent = value;
+      panel.appendChild(valueEl);
     }
 
-    showPanel(
-      `<div class="panel-type">${escapeHtml(typeLabel)}</div>` +
-      `<div class="panel-value">${escapeHtml(value)}</div>`
-    );
+    showPanel(panel);
   }
 
   function showFramePanel(field, slide) {
     const meta = slideData.meta;
     const frame = slide.frame;
     const metaValue = meta[field] || "";
-    const hasOverride = Object.prototype.hasOwnProperty.call(frame, field) && frame[field] !== metaValue;
+    const hasOverride = frame[field] !== metaValue;
 
-    let html = `<div class="panel-type">Frame: ${escapeHtml(field)}</div>`;
-    html += `<div class="panel-value">${escapeHtml(frame[field] || "")}</div>`;
+    const panel = document.createElement("div");
 
+    const typeEl = document.createElement("div");
+    typeEl.className = "panel-type";
+    typeEl.textContent = "Frame: " + field;
+    panel.appendChild(typeEl);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "panel-input";
+    input.value = frame[field] || "";
+    panel.appendChild(input);
+
+    const overridesEl = document.createElement("div");
+    overridesEl.className = "panel-overrides";
     if (hasOverride) {
-      html += `<div class="panel-overrides">` +
-        `<span class="override-label">Override: </span>` +
-        `<span class="override-value">This slide overrides the meta ${escapeHtml(field)} ` +
-        `(meta value: "${escapeHtml(metaValue)}")</span>` +
-        `</div>`;
+      overridesEl.innerHTML =
+        '<span class="override-label">Override: </span>' +
+        '<span class="override-value">This slide overrides the meta ' + field +
+        ' (meta value: "' + metaValue.replace(/[<>&"]/g, "") + '")</span>';
     } else {
-      html += `<div class="panel-overrides">` +
-        `<span class="override-value">Inherited from meta</span>` +
-        `</div>`;
+      overridesEl.innerHTML = '<span class="override-value">Inherited from meta</span>';
     }
+    panel.appendChild(overridesEl);
 
-    showPanel(html);
+    const originalValue = frame[field] || "";
+    panel.appendChild(createButtons(
+      async () => {
+        frame[field] = input.value;
+        await saveSlideData();
+      },
+      () => {
+        input.value = originalValue;
+      }
+    ));
+
+    showPanel(panel);
   }
 
   // --- Shared slide rendering ---

@@ -31,8 +31,8 @@ describe("parseArgs", () => {
     expect(opts.port).toBe("8080");
   });
 
-  it("defaults port to 3000", () => {
+  it("defaults port to 4000", () => {
     const opts = parseArgs([]);
-    expect(opts.port).toBe("3000");
+    expect(opts.port).toBe("4000");
   });
 });
