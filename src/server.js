@@ -2,12 +2,12 @@ const path = require("path");
 const fs = require("fs");
 const fastify = require("fastify");
 const fastifyStatic = require("@fastify/static");
-const { loadContent } = require("./loader");
+const { loadContent, saveContent } = require("./loader");
 
 function buildApp(opts) {
   const app = fastify({ logger: false });
 
-  const slideData = loadContent(opts.content);
+  let slideData = loadContent(opts.content);
   const customStyles = (opts.style || []).map((stylePath) =>
     fs.readFileSync(stylePath, "utf-8")
   );
@@ -18,6 +18,12 @@ function buildApp(opts) {
   });
 
   app.get("/api/slides", async () => {
+    return slideData;
+  });
+
+  app.put("/api/slides", async (request) => {
+    slideData = request.body;
+    saveContent(opts.content, slideData);
     return slideData;
   });
 

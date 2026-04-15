@@ -57,6 +57,55 @@ slides:
     });
   });
 
+  describe("PUT /api/slides", () => {
+    it("updates slide data and persists to file", async () => {
+      const contentPath = writeContent(
+        "content.yaml",
+        `
+meta:
+  title: Original
+slides:
+  - content:
+    - text: Hello
+`
+      );
+
+      app = buildApp({ content: contentPath, style: [] });
+
+      const updated = {
+        meta: { title: "Updated", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "Updated", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Changed" }],
+          },
+        ],
+      };
+
+      const putRes = await app.inject({
+        method: "PUT",
+        url: "/api/slides",
+        payload: updated,
+      });
+
+      expect(putRes.statusCode).toBe(200);
+      const putBody = JSON.parse(putRes.payload);
+      expect(putBody.meta.title).toBe("Updated");
+      expect(putBody.slides[0].content[0].value).toBe("Changed");
+
+      // Verify GET returns updated data
+      const getRes = await app.inject({ method: "GET", url: "/api/slides" });
+      const getBody = JSON.parse(getRes.payload);
+      expect(getBody.meta.title).toBe("Updated");
+
+      // Verify file was written
+      const fs = require("fs");
+      const raw = fs.readFileSync(contentPath, "utf-8");
+      expect(raw).toContain("Updated");
+      expect(raw).toContain("Changed");
+    });
+  });
+
   describe("GET /api/styles", () => {
     it("returns empty array when no custom styles", async () => {
       const contentPath = writeContent(
@@ -132,6 +181,26 @@ slides:
 
       expect(res.statusCode).toBe(200);
       expect(res.headers["content-type"]).toMatch(/text\/html/);
+    });
+  });
+
+  describe("GET /editor.html", () => {
+    it("serves the editor page", async () => {
+      const contentPath = writeContent(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hi
+`
+      );
+
+      app = buildApp({ content: contentPath, style: [] });
+      const res = await app.inject({ method: "GET", url: "/editor.html" });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/text\/html/);
+      expect(res.payload).toContain("Editor");
     });
   });
 });

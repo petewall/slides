@@ -1,7 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { loadContent } = require("../src/loader");
+const yaml = require("js-yaml");
+const { loadContent, saveContent } = require("../src/loader");
 
 describe("loadContent", () => {
   let tmpDir;
@@ -157,6 +158,69 @@ slides:
     });
   });
 
+  describe("speaker notes", () => {
+    it("preserves speaker notes on a slide", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hello
+    notes: Remember to greet the audience
+`
+      );
+      const result = loadContent(filePath);
+      expect(result.slides[0].notes).toBe("Remember to greet the audience");
+    });
+
+    it("defaults notes to empty string when not provided", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hello
+`
+      );
+      const result = loadContent(filePath);
+      expect(result.slides[0].notes).toBe("");
+    });
+
+    it("round-trips speaker notes through save/load", () => {
+      const data = {
+        meta: { title: "", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Hello" }],
+            notes: "Talk slowly here",
+          },
+        ],
+      };
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded.slides[0].notes).toBe("Talk slowly here");
+    });
+
+    it("does not write notes field when empty", () => {
+      const data = {
+        meta: { title: "", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Hello" }],
+            notes: "",
+          },
+        ],
+      };
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const raw = fs.readFileSync(outPath, "utf-8");
+      expect(raw).not.toContain("notes");
+    });
+  });
+
   describe("content normalization", () => {
     it("normalizes text shorthand", () => {
       const filePath = writeFile(
@@ -258,6 +322,107 @@ slides:
       expect(col.items).toHaveLength(2);
       expect(col.items[0]).toEqual({ type: "text", value: "Left" });
       expect(col.items[1]).toEqual({ type: "text", value: "Right" });
+    });
+  });
+
+  describe("saveContent", () => {
+    it("round-trips a simple presentation", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+meta:
+  title: My Talk
+slides:
+  - content:
+    - text: Hello
+`
+      );
+      const data = loadContent(filePath);
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded).toEqual(data);
+    });
+
+    it("preserves slide frame overrides", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+meta:
+  title: Global
+slides:
+  - title: Custom
+    content:
+    - text: Hello
+`
+      );
+      const data = loadContent(filePath);
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded.slides[0].frame.title).toBe("Custom");
+    });
+
+    it("preserves blanked frame fields", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+meta:
+  title: Global
+  subtitle: Sub
+slides:
+  - title: ""
+    subtitle: ""
+    content:
+    - text: Hello
+`
+      );
+      const data = loadContent(filePath);
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded.slides[0].frame.title).toBe("");
+      expect(reloaded.slides[0].frame.subtitle).toBe("");
+    });
+
+    it("preserves all content types", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hello
+      size: larger
+    - image: https://example.com/pic.png
+    - iframe:
+        url: https://example.com
+    - html: "<div>Custom</div>"
+    - columns:
+      - text: Left
+      - text: Right
+`
+      );
+      const data = loadContent(filePath);
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded).toEqual(data);
+    });
+
+    it("writes valid YAML", () => {
+      const data = {
+        meta: { title: "Test", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "Test", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Hello" }],
+          },
+        ],
+      };
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const raw = fs.readFileSync(outPath, "utf-8");
+      expect(() => yaml.load(raw)).not.toThrow();
     });
   });
 

@@ -41,8 +41,9 @@ function loadContent(filePath) {
     }
 
     const content = (slide.content || []).map(normalizeContentItem);
+    const notes = slide.notes || "";
 
-    return { frame, content };
+    return { frame, content, notes };
   });
 
   return { meta, slides };
@@ -79,4 +80,62 @@ function normalizeContentItem(item) {
   return item;
 }
 
-module.exports = { loadContent };
+function saveContent(filePath, data) {
+  const ext = path.extname(filePath).toLowerCase();
+
+  const rawData = {
+    meta: data.meta,
+    slides: data.slides.map((slide) => denormalizeSlide(slide, data.meta)),
+  };
+
+  let output;
+  if (ext === ".yaml" || ext === ".yml") {
+    output = yaml.dump(rawData, { lineWidth: -1, noRefs: true });
+  } else if (ext === ".json") {
+    output = JSON.stringify(rawData, null, 2);
+  } else {
+    throw new Error(`Unsupported file format: ${ext}`);
+  }
+
+  fs.writeFileSync(filePath, output, "utf-8");
+}
+
+function denormalizeSlide(slide, meta) {
+  const raw = {};
+
+  for (const field of FRAME_FIELDS) {
+    if (slide.frame[field] !== meta[field]) {
+      raw[field] = slide.frame[field];
+    }
+  }
+
+  raw.content = slide.content.map(denormalizeContentItem);
+  if (slide.notes) {
+    raw.notes = slide.notes;
+  }
+  return raw;
+}
+
+function denormalizeContentItem(item) {
+  switch (item.type) {
+    case "text": {
+      const raw = { text: item.value };
+      if (item.size) {
+        raw.size = item.size;
+      }
+      return raw;
+    }
+    case "image":
+      return { image: item.url };
+    case "iframe":
+      return { iframe: { url: item.url } };
+    case "html":
+      return { html: item.value };
+    case "columns":
+      return { columns: item.items.map(denormalizeContentItem) };
+    default:
+      return item;
+  }
+}
+
+module.exports = { loadContent, saveContent };

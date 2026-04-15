@@ -31,6 +31,19 @@ module.exports = [
     },
   },
   {
+    files: ["public/**/*.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        document: "readonly",
+        window: "readonly",
+        fetch: "readonly",
+        HTMLElement: "readonly",
+        URLSearchParams: "readonly",
+      },
+    },
+  },
+  {
     files: ["test/**/*.js"],
     languageOptions: {
       globals: {
