@@ -77,6 +77,13 @@ function normalizeContentItem(item) {
     };
   }
 
+  if (item.rows !== undefined) {
+    return {
+      type: "rows",
+      items: item.rows.map(normalizeContentItem),
+    };
+  }
+
   return item;
 }
 
@@ -133,6 +140,8 @@ function denormalizeContentItem(item) {
       return { html: item.value };
     case "columns":
       return { columns: item.items.map(denormalizeContentItem) };
+    case "rows":
+      return { rows: item.items.map(denormalizeContentItem) };
     default:
       return item;
   }
