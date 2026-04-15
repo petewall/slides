@@ -90,6 +90,17 @@ slides:
       - text: "2. Demo"
 ```
 
+### Speaker notes
+
+Each slide can include a `notes` field for speaker notes. Notes are not rendered during presentation but are visible in the editor.
+
+```yaml
+slides:
+  - content:
+      - text: "Key takeaway"
+    notes: Remember to mention the quarterly results here.
+```
+
 ### Content types
 
 The `content` array is a list of rows, distributed vertically on the slide. Each item is one of:
@@ -164,6 +175,7 @@ slides:
       - text: "1. What is Slides?"
       - text: "2. Content types"
       - text: "3. Customization"
+    notes: Keep this brief, just a roadmap for the audience.
 
   - title: Content Types
     content:

@@ -189,9 +189,50 @@ html, body {
   min-height: 200px;
   background: var(--bg-surface);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  font-size: 0.9rem;
+}
+
+#panel-inspector {
+  flex: 1;
   padding: 1rem 1.5rem;
   overflow-y: auto;
-  font-size: 0.9rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#panel-notes {
+  width: 320px;
+  min-width: 320px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#panel-notes .panel-type {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#notes-input {
+  flex: 1;
+  display: block;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: none;
+}
+
+#notes-input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 #panel-placeholder {

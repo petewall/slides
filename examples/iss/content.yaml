@@ -1,68 +1,57 @@
 meta:
   title: The International Space Station
   subtitle: by a 7th Grader
-  date: "April 2026"
-
+  date: April 2026
+  logo: ''
 slides:
-  # Title slide
-  - title: ""
-    subtitle: ""
+  - title: ''
+    subtitle: ''
     content:
       - text: The International Space Station
         size: larger
       - image: https://images-assets.nasa.gov/image/iss056e201262/iss056e201262~medium.jpg
       - text: by a 7th Grader
-
-  # What is the ISS?
   - content:
       - text: What is the ISS?
         size: larger
       - text: The International Space Station is a huge science lab that floats about 250 miles above Earth.
       - text: It travels at 17,500 mph and orbits Earth every 90 minutes!
       - text: That means astronauts see 16 sunrises and sunsets every single day.
-
-  # Who built it?
+    notes: Start with the basics. Ask the audience if they've ever seen the ISS in the night sky.
   - content:
       - text: Who Built It?
         size: larger
       - text: It took over 15 countries working together to build the ISS.
       - text: Construction started in 1998 and it took over 10 years to finish.
       - image: https://images-assets.nasa.gov/image/iss016e010001/iss016e010001~medium.jpg
-
-  # Life on the ISS
   - content:
       - text: Life on the ISS
         size: larger
       - columns:
           - image: https://images-assets.nasa.gov/image/iss044e088112/iss044e088112~medium.jpg
           - text: Astronauts live and work on the ISS for about 6 months at a time. They do science experiments, exercise 2 hours a day, and eat food from pouches!
-
-  # The View
   - content:
       - text: The View from Space
         size: larger
       - image: https://images-assets.nasa.gov/image/jsc2024e050831/jsc2024e050831~orig.jpg
       - text: The Cupola is a big window module where astronauts can look down at Earth.
-
-  # Fun Facts
   - content:
       - text: Fun Facts
         size: larger
       - columns:
-          - text: "The ISS is about the size of a football field"
-          - text: "Over 270 people from 21 countries have visited"
-          - text: "It weighs about 925,000 pounds"
-
-  # Live tracker
+          - text: The ISS is about the size of a football field
+          - text: Over 270 people from 21 countries have visited
+          - text: It weighs about 925,000 pounds
+    notes: Pause after each fact for effect. The football field comparison always gets a reaction.
   - title: Where is the ISS Right Now?
     content:
       - iframe:
           url: https://www.astroviewer.net/iss/en/
-
-  # Thank you
-  - title: ""
-    subtitle: ""
+  - title: ''
+    subtitle: ''
     content:
       - text: Thank You!
         size: larger
       - text: Any Questions?
+  - content:
+      - text: Pete Wall, a 7th grader

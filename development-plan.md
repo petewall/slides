@@ -20,4 +20,4 @@ _No planned features at this time._
 - [ ] Set styles
 - [x] Add and delete slides
 - [ ] Update content grid
-- [ ] Update speaker notes
+- [x] Update speaker notes

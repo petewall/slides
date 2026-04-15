@@ -15,8 +15,18 @@
         <div id="slide-container"></div>
       </div>
       <div id="editor-panel">
-        <div id="panel-placeholder">Click a content block to inspect it</div>
-        <div id="panel-content" class="hidden"></div>
+        <div id="panel-inspector">
+          <div id="panel-placeholder">Click a content block to inspect it</div>
+          <div id="panel-content" class="hidden"></div>
+        </div>
+        <div id="panel-notes">
+          <div class="panel-type">Speaker Notes</div>
+          <textarea id="notes-input" placeholder="Add speaker notes..."></textarea>
+          <div id="notes-buttons" class="panel-buttons">
+            <button class="panel-btn panel-btn-save" id="notes-save">Save</button>
+            <button class="panel-btn panel-btn-cancel" id="notes-cancel">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

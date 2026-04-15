@@ -158,6 +158,69 @@ slides:
     });
   });
 
+  describe("speaker notes", () => {
+    it("preserves speaker notes on a slide", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hello
+    notes: Remember to greet the audience
+`
+      );
+      const result = loadContent(filePath);
+      expect(result.slides[0].notes).toBe("Remember to greet the audience");
+    });
+
+    it("defaults notes to empty string when not provided", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - text: Hello
+`
+      );
+      const result = loadContent(filePath);
+      expect(result.slides[0].notes).toBe("");
+    });
+
+    it("round-trips speaker notes through save/load", () => {
+      const data = {
+        meta: { title: "", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Hello" }],
+            notes: "Talk slowly here",
+          },
+        ],
+      };
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const reloaded = loadContent(outPath);
+      expect(reloaded.slides[0].notes).toBe("Talk slowly here");
+    });
+
+    it("does not write notes field when empty", () => {
+      const data = {
+        meta: { title: "", subtitle: "", date: "", logo: "" },
+        slides: [
+          {
+            frame: { title: "", subtitle: "", date: "", logo: "" },
+            content: [{ type: "text", value: "Hello" }],
+            notes: "",
+          },
+        ],
+      };
+      const outPath = path.join(tmpDir, "out.yaml");
+      saveContent(outPath, data);
+      const raw = fs.readFileSync(outPath, "utf-8");
+      expect(raw).not.toContain("notes");
+    });
+  });
+
   describe("content normalization", () => {
     it("normalizes text shorthand", () => {
       const filePath = writeFile(

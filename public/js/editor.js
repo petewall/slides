@@ -66,6 +66,7 @@
     const newSlide = {
       frame: { ...slideData.meta },
       content: [{ type: "text", value: "New slide" }],
+      notes: "",
     };
     slideData.slides.splice(selectedSlide + 1, 0, newSlide);
     selectedSlide = selectedSlide + 1;
@@ -158,6 +159,29 @@
     const slide = slideData.slides[selectedSlide];
     container.appendChild(renderSlide(slide, selectedSlide));
     attachClickHandlers(container, slide);
+    renderNotes(slide);
+  }
+
+  function renderNotes(slide) {
+    const input = document.getElementById("notes-input");
+    input.value = slide.notes || "";
+
+    const saveBtn = document.getElementById("notes-save");
+    const cancelBtn = document.getElementById("notes-cancel");
+
+    const newSave = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSave, saveBtn);
+    const newCancel = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+    const originalValue = slide.notes || "";
+    newSave.addEventListener("click", async () => {
+      slide.notes = input.value;
+      await saveSlideData();
+    });
+    newCancel.addEventListener("click", () => {
+      input.value = originalValue;
+    });
   }
 
   function attachContentClickHandlers(parentEl, items) {

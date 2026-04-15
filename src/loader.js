@@ -41,8 +41,9 @@ function loadContent(filePath) {
     }
 
     const content = (slide.content || []).map(normalizeContentItem);
+    const notes = slide.notes || "";
 
-    return { frame, content };
+    return { frame, content, notes };
   });
 
   return { meta, slides };
@@ -109,6 +110,9 @@ function denormalizeSlide(slide, meta) {
   }
 
   raw.content = slide.content.map(denormalizeContentItem);
+  if (slide.notes) {
+    raw.notes = slide.notes;
+  }
   return raw;
 }
 
