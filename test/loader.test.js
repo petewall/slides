@@ -305,6 +305,25 @@ slides:
       });
     });
 
+    it("normalizes rows with nested content", () => {
+      const filePath = writeFile(
+        "content.yaml",
+        `
+slides:
+  - content:
+    - rows:
+      - text: Top
+      - text: Bottom
+`
+      );
+      const result = loadContent(filePath);
+      const row = result.slides[0].content[0];
+      expect(row.type).toBe("rows");
+      expect(row.items).toHaveLength(2);
+      expect(row.items[0]).toEqual({ type: "text", value: "Top" });
+      expect(row.items[1]).toEqual({ type: "text", value: "Bottom" });
+    });
+
     it("normalizes columns with nested content", () => {
       const filePath = writeFile(
         "content.yaml",
@@ -400,6 +419,9 @@ slides:
     - columns:
       - text: Left
       - text: Right
+    - rows:
+      - text: Top
+      - text: Bottom
 `
       );
       const data = loadContent(filePath);

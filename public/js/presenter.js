@@ -125,6 +125,8 @@
         return renderHtml(item);
       case "columns":
         return renderColumns(item);
+      case "rows":
+        return renderRows(item);
       default: {
         const el = document.createElement("div");
         el.textContent = `Unknown content type: ${item.type}`;
@@ -185,6 +187,18 @@
       col.className = "content-column";
       col.appendChild(renderContentItem(child));
       el.appendChild(col);
+    });
+    return el;
+  }
+
+  function renderRows(item) {
+    const el = document.createElement("div");
+    el.className = "content-rows";
+    item.items.forEach((child) => {
+      const row = document.createElement("div");
+      row.className = "content-row";
+      row.appendChild(renderContentItem(child));
+      el.appendChild(row);
     });
     return el;
   }

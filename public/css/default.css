@@ -183,6 +183,20 @@ html, body {
   justify-content: center;
 }
 
+/* Rows layout */
+.content-rows {
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.content-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 /* Progress bar */
 #progress-bar {
   position: fixed;

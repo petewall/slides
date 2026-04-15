@@ -188,16 +188,16 @@
     const children = parentEl.children;
     items.forEach((item, i) => {
       const el = children[i];
-      if (item.type === "columns") {
-        // Columns container itself is clickable
+      if (item.type === "columns" || item.type === "rows") {
+        // Container itself is clickable
         el.addEventListener("click", (e) => {
           e.stopPropagation();
           selectContentBlock(el, item);
         });
-        // Column children are also clickable (stopPropagation prevents bubbling to container)
+        // Children are also clickable (stopPropagation prevents bubbling to container)
         item.items.forEach((child, j) => {
-          const colEl = el.children[j];
-          const childEl = colEl.firstChild;
+          const childWrapper = el.children[j];
+          const childEl = childWrapper.firstChild;
           if (childEl) {
             childEl.addEventListener("click", (e) => {
               e.stopPropagation();
@@ -339,6 +339,8 @@
         return { label: "HTML", key: "value", value: item.value };
       case "columns":
         return { label: "Columns", key: null, value: item.items.length + " columns" };
+      case "rows":
+        return { label: "Rows", key: null, value: item.items.length + " rows" };
       default:
         return { label: item.type, key: null, value: JSON.stringify(item) };
     }
@@ -498,6 +500,8 @@
         return renderHtml(item);
       case "columns":
         return renderColumns(item);
+      case "rows":
+        return renderRows(item);
       default: {
         const el = document.createElement("div");
         el.textContent = `Unknown content type: ${item.type}`;
@@ -558,6 +562,18 @@
       col.className = "content-column";
       col.appendChild(renderContentItem(child));
       el.appendChild(col);
+    });
+    return el;
+  }
+
+  function renderRows(item) {
+    const el = document.createElement("div");
+    el.className = "content-rows";
+    item.items.forEach((child) => {
+      const row = document.createElement("div");
+      row.className = "content-row";
+      row.appendChild(renderContentItem(child));
+      el.appendChild(row);
     });
     return el;
   }
